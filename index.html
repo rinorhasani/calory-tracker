@@ -8,247 +8,207 @@
   <meta name="apple-mobile-web-app-title" content="CalAI" />
   <meta name="theme-color" content="#0e100f" />
   <title>CalAI – AI Calorie Tracker</title>
-
-  <!-- PWA Manifest inline -->
   <link rel="manifest" href="manifest.json" />
-
-  <!-- Apple Touch Icons (inline SVG data URI) -->
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230e100f'/%3E%3Ctext x='90' y='115' font-size='80' text-anchor='middle'%3E%F0%9F%8D%8F%3C/text%3E%3C/svg%3E" />
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Mono:ital,wght@0,400;0,500;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+ 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
     :root {
       --bg: #0e100f;
       --surface: rgba(255,255,255,0.04);
-      --surface-hover: rgba(255,255,255,0.07);
+      --surface2: rgba(255,255,255,0.07);
       --border: rgba(255,255,255,0.08);
-      --border-strong: rgba(255,255,255,0.14);
+      --border2: rgba(255,255,255,0.14);
       --text: #f8f4f0;
-      --text-muted: rgba(248,244,240,0.45);
-      --text-dim: rgba(248,244,240,0.25);
+      --muted: rgba(248,244,240,0.45);
+      --dim: rgba(248,244,240,0.25);
       --green: #4ade80;
-      --green-dim: rgba(74,222,128,0.15);
+      --green-bg: rgba(74,222,128,0.12);
       --green-border: rgba(74,222,128,0.3);
       --blue: #60a5fa;
       --pink: #f9a8d4;
       --amber: #fbbf24;
       --red: #f87171;
+      --orange: #fb923c;
+      --purple: #c084fc;
       --safe: env(safe-area-inset-bottom, 0px);
     }
-
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow: hidden; }
-
-    #app { height: 100%; display: flex; flex-direction: column; background: radial-gradient(ellipse 100% 50% at 50% -5%, rgba(74,222,128,0.1) 0%, transparent 55%), var(--bg); }
-
-    /* ── SCREENS ── */
-    .screen { display: none; flex-direction: column; height: 100%; overflow: hidden; }
-    .screen.active { display: flex; }
-
-    /* ── SETUP SCREEN ── */
-    #setup-screen { align-items: center; justify-content: center; padding: 32px 28px; gap: 0; }
-    .setup-logo { font-size: 56px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
-    .setup-title { font-family: 'Lora', serif; font-size: 30px; font-weight: 700; text-align: center; line-height: 1.2; margin-bottom: 8px; }
-    .setup-sub { font-size: 14px; color: var(--text-muted); text-align: center; line-height: 1.5; margin-bottom: 36px; }
-    .setup-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; align-self: flex-start; width: 100%; }
-    .setup-input {
-      width: 100%; background: var(--surface); border: 1px solid var(--border-strong);
-      border-radius: 14px; padding: 14px 16px; font-family: 'DM Mono', monospace;
-      font-size: 13px; color: var(--text); outline: none; transition: border 0.2s;
-      -webkit-appearance: none; appearance: none;
-    }
-    .setup-input:focus { border-color: var(--green); }
-    .setup-hint { font-size: 11px; color: var(--text-dim); text-align: center; margin-top: 10px; line-height: 1.5; }
-    .setup-hint a { color: var(--green); text-decoration: none; }
-    .btn-primary {
-      width: 100%; background: var(--green); color: #0e100f; border: none;
-      border-radius: 14px; padding: 15px; font-size: 15px; font-weight: 700;
-      cursor: pointer; margin-top: 20px; font-family: 'DM Sans', sans-serif;
-      transition: opacity 0.2s, transform 0.1s; -webkit-appearance: none;
-    }
-    .btn-primary:active { opacity: 0.8; transform: scale(0.98); }
-
-    /* ── MAIN SCREEN ── */
-    #main-screen { position: relative; }
-
-    .topbar {
-      padding: 52px 20px 0;
-      padding-top: max(52px, calc(env(safe-area-inset-top) + 12px));
-      flex-shrink: 0;
-    }
-    .topbar-row { display: flex; justify-content: space-between; align-items: flex-start; }
-    .topbar-eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--green); text-transform: uppercase; margin-bottom: 3px; }
-    .topbar-title { font-family: 'Lora', serif; font-size: 24px; font-weight: 700; }
-    .topbar-date { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); text-align: right; line-height: 1.6; }
-    .settings-btn { background: none; border: none; font-size: 20px; cursor: pointer; padding: 4px; color: var(--text-muted); }
-
-    /* Stats Row */
-    .stats-row { display: flex; justify-content: center; gap: 12px; padding: 20px 20px 0; flex-shrink: 0; }
-
-    /* Scrollable content */
-    .scroll-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px; padding-bottom: calc(100px + var(--safe)); }
-
-    /* Upload Zone */
-    .upload-zone {
-      border: 2px dashed var(--border-strong); border-radius: 20px;
-      padding: 28px 20px; text-align: center; cursor: pointer;
-      background: var(--surface); transition: all 0.25s ease; margin: 20px 0 0;
-      -webkit-appearance: none;
-    }
-    .upload-zone.dragover { border-color: var(--green); background: var(--green-dim); }
-    .upload-zone:active { transform: scale(0.98); }
-    .upload-icon { font-size: 30px; margin-bottom: 8px; }
-    .upload-title { font-family: 'Lora', serif; font-size: 15px; color: var(--text); margin-bottom: 4px; }
-    .upload-sub { font-size: 11px; color: var(--text-dim); }
-
-    /* Preview Card */
-    .preview-card { background: var(--surface); border-radius: 20px; overflow: hidden; border: 1px solid var(--border); margin: 20px 0 0; }
-    .preview-img { width: 100%; max-height: 200px; object-fit: cover; display: block; }
-    .preview-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 32px; }
-    .spinner { width: 36px; height: 36px; border: 3px solid rgba(74,222,128,0.15); border-top-color: var(--green); border-radius: 50%; animation: spin 0.9s linear infinite; }
-    .loader-text { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
-    .analysis-body { padding: 16px 18px; }
-    .analysis-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .analysis-name { font-family: 'Lora', serif; font-size: 17px; font-weight: 700; }
-    .analysis-serving { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .analysis-cals { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: 700; color: var(--green); }
-    .macro-row { display: flex; gap: 8px; margin-bottom: 12px; }
-    .macro-chip { flex: 1; background: rgba(255,255,255,0.04); border-radius: 10px; padding: 8px 6px; text-align: center; }
-    .macro-val { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 700; }
-    .macro-lbl { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
-    .analysis-note { font-size: 11px; color: var(--text-dim); font-style: italic; margin-bottom: 12px; }
-    .btn-row { display: flex; gap: 10px; }
-    .btn-confirm { flex: 1; background: var(--green); color: #0e100f; border: none; border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-    .btn-confirm:active { opacity: 0.8; }
-    .btn-cancel { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 13px 16px; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-    .btn-cancel:active { opacity: 0.7; }
-    .error-body { padding: 16px 18px; }
-    .error-msg { color: var(--red); font-size: 13px; margin-bottom: 12px; }
-
-    /* Tabs */
-    .tabs { display: flex; gap: 5px; background: var(--surface); border-radius: 14px; padding: 5px; margin: 18px 0 0; flex-shrink: 0; }
-    .tab {
-      flex: 1; background: transparent; border: 1px solid transparent; border-radius: 10px;
-      padding: 8px 4px; cursor: pointer; transition: all 0.2s; -webkit-appearance: none;
-    }
-    .tab.active { background: var(--green-dim); border-color: var(--green-border); }
-    .tab-label { font-size: 11px; font-weight: 600; color: var(--text-dim); }
-    .tab.active .tab-label { color: var(--green); }
-    .tab-stat { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-dim); margin-top: 2px; }
-    .tab.active .tab-stat { color: rgba(74,222,128,0.6); }
-
-    /* Goal Bar */
-    .goal-bar { background: var(--surface); border-radius: 14px; padding: 14px 16px; margin: 14px 0 0; }
-    .goal-bar-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-    .goal-bar-label { font-size: 12px; color: var(--text-muted); }
-    .goal-bar-val { font-family: 'DM Mono', monospace; font-size: 12px; }
-    .goal-track { height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
-    .goal-fill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
-    .goal-remaining { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
-
-    /* Meals */
-    .meals-section { margin-top: 18px; }
-    .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .section-title { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); }
-    .section-cals { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--green); }
-    .empty-state { text-align: center; padding: 48px 0; }
-    .empty-icon { font-size: 32px; margin-bottom: 10px; }
-    .empty-text { font-family: 'Lora', serif; font-size: 14px; color: var(--text-dim); }
-
-    .meal-card {
-      display: flex; gap: 12px; align-items: flex-start;
-      background: var(--surface); border-radius: 14px; border: 1px solid var(--border);
-      padding: 12px 14px; margin-bottom: 8px; transition: background 0.2s;
-    }
-    .meal-card:active { background: var(--surface-hover); }
-    .meal-thumb { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); }
-    .meal-thumb-placeholder { width: 50px; height: 50px; border-radius: 10px; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .meal-info { flex: 1; min-width: 0; }
-    .meal-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .meal-name { font-family: 'Lora', serif; font-size: 14px; font-weight: 600; line-height: 1.3; }
-    .meal-cals { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700; color: var(--green); flex-shrink: 0; }
-    .meal-macros { display: flex; gap: 8px; margin-top: 4px; }
-    .meal-macro { font-size: 10px; font-family: 'DM Mono', monospace; }
-    .meal-footer { display: flex; justify-content: space-between; margin-top: 4px; }
-    .meal-time { font-size: 10px; color: var(--text-dim); }
-    .meal-delete { font-size: 10px; color: var(--text-dim); background: none; border: none; cursor: pointer; padding: 0; font-family: 'DM Sans', sans-serif; }
-    .meal-delete:active { color: var(--red); }
-
-    .day-group { margin-bottom: 20px; }
-
-    /* Bottom Nav */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      padding: 12px 20px;
-      padding-bottom: max(12px, var(--safe));
-      background: rgba(14,16,15,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border);
-      z-index: 100;
-    }
-    .camera-btn {
-      width: 100%; background: var(--green); color: #0e100f; border: none; border-radius: 16px;
-      padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      font-family: 'DM Sans', sans-serif; transition: opacity 0.2s, transform 0.1s;
-      -webkit-appearance: none;
-    }
-    .camera-btn:active { opacity: 0.85; transform: scale(0.98); }
-
-    /* Circle SVG */
-    .circle-wrap { position: relative; flex-shrink: 0; }
-    .circle-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; }
-    .circle-val { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 700; line-height: 1; }
-    .circle-lbl { font-size: 9px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
-
-    /* Settings overlay */
-    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: flex-end; }
-    .overlay.open { display: flex; }
-    .overlay-card {
-      width: 100%; background: #1a1c1b; border-radius: 24px 24px 0 0;
-      padding: 24px 24px;
-      padding-bottom: max(32px, var(--safe));
-      border-top: 1px solid var(--border);
-    }
-    .overlay-handle { width: 40px; height: 4px; background: var(--border-strong); border-radius: 2px; margin: 0 auto 20px; }
-    .overlay-title { font-family: 'Lora', serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; }
-    .overlay-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
-    .overlay-input { width: 100%; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 12px; padding: 12px 14px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); outline: none; -webkit-appearance: none; }
-    .overlay-input:focus { border-color: var(--green); }
-    .btn-save { width: 100%; background: var(--green); color: #0e100f; border: none; border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 16px; font-family: 'DM Sans', sans-serif; }
-    .btn-clear-all { width: 100%; background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.2); border-radius: 12px; padding: 13px; font-size: 14px; cursor: pointer; margin-top: 10px; font-family: 'DM Sans', sans-serif; }
-
-    /* Animations */
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    .slide-up { animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
-
-    ::-webkit-scrollbar { display: none; }
-    input[type="file"] { display: none; }
+    html,body { height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; overflow:hidden; }
+    #app { height:100%; display:flex; flex-direction:column; background:radial-gradient(ellipse 100% 50% at 50% -5%, rgba(74,222,128,0.1) 0%, transparent 55%), var(--bg); }
+    .screen { display:none; flex-direction:column; height:100%; overflow:hidden; }
+    .screen.active { display:flex; }
+ 
+    /* SETUP */
+    #setup-screen { align-items:center; justify-content:center; padding:32px 28px; overflow-y:auto; }
+    .setup-logo { font-size:56px; margin-bottom:20px; animation:float 3s ease-in-out infinite; }
+    .setup-title { font-family:'Lora',serif; font-size:30px; font-weight:700; text-align:center; margin-bottom:8px; }
+    .setup-sub { font-size:14px; color:var(--muted); text-align:center; line-height:1.5; margin-bottom:32px; }
+    .field-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; align-self:flex-start; width:100%; }
+    .field-input { width:100%; background:var(--surface); border:1px solid var(--border2); border-radius:14px; padding:14px 16px; font-family:'DM Mono',monospace; font-size:13px; color:var(--text); outline:none; transition:border .2s; -webkit-appearance:none; margin-bottom:16px; }
+    .field-input:focus { border-color:var(--green); }
+    .setup-hint { font-size:11px; color:var(--dim); text-align:center; margin-top:8px; line-height:1.5; }
+    .setup-hint a { color:var(--green); text-decoration:none; }
+    .btn-primary { width:100%; background:var(--green); color:#0e100f; border:none; border-radius:14px; padding:15px; font-size:15px; font-weight:700; cursor:pointer; margin-top:16px; font-family:'DM Sans',sans-serif; transition:opacity .2s,transform .1s; -webkit-appearance:none; }
+    .btn-primary:active { opacity:.8; transform:scale(.98); }
+ 
+    /* TOPBAR */
+    .topbar { padding:max(52px, calc(env(safe-area-inset-top) + 12px)) 20px 0; flex-shrink:0; }
+    .topbar-row { display:flex; justify-content:space-between; align-items:flex-start; }
+    .topbar-eyebrow { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.18em; color:var(--green); text-transform:uppercase; margin-bottom:3px; }
+    .topbar-title { font-family:'Lora',serif; font-size:24px; font-weight:700; }
+    .topbar-right { display:flex; align-items:center; gap:8px; }
+    .topbar-date { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); text-align:right; line-height:1.6; }
+    .icon-btn { background:none; border:none; font-size:20px; cursor:pointer; padding:4px; }
+ 
+    /* STATS */
+    .stats-row { display:flex; justify-content:center; gap:12px; padding:20px 20px 0; flex-shrink:0; }
+    .circle-wrap { position:relative; flex-shrink:0; }
+    .circle-inner { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; }
+    .circle-val { font-family:'DM Mono',monospace; font-size:18px; font-weight:700; line-height:1; }
+    .circle-lbl { font-size:9px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+ 
+    /* SCROLL */
+    .scroll-content { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:0 20px; padding-bottom:calc(100px + var(--safe)); }
+ 
+    /* UPLOAD */
+    .upload-zone { border:2px dashed var(--border2); border-radius:20px; padding:28px 20px; text-align:center; cursor:pointer; background:var(--surface); transition:all .25s; margin:20px 0 0; }
+    .upload-zone:active { transform:scale(.98); }
+    .upload-icon { font-size:30px; margin-bottom:8px; }
+    .upload-title { font-family:'Lora',serif; font-size:15px; margin-bottom:4px; }
+    .upload-sub { font-size:11px; color:var(--dim); }
+ 
+    /* PREVIEW */
+    .preview-card { background:var(--surface); border-radius:20px; overflow:hidden; border:1px solid var(--border); margin:20px 0 0; }
+    .preview-img { width:100%; max-height:180px; object-fit:cover; display:block; }
+    .preview-loader { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:32px; }
+    .spinner { width:36px; height:36px; border:3px solid rgba(74,222,128,.15); border-top-color:var(--green); border-radius:50%; animation:spin .9s linear infinite; }
+    .loader-text { font-family:'DM Mono',monospace; font-size:12px; color:var(--muted); }
+ 
+    /* ANALYSIS */
+    .analysis-body { padding:16px 18px; }
+    .analysis-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+    .analysis-name { font-family:'Lora',serif; font-size:18px; font-weight:700; line-height:1.2; }
+    .analysis-serving { font-size:11px; color:var(--muted); margin-top:2px; }
+    .analysis-cals { font-family:'DM Mono',monospace; font-size:28px; font-weight:700; color:var(--green); line-height:1; }
+    .analysis-cals-lbl { font-size:10px; color:var(--muted); text-align:right; margin-top:2px; }
+ 
+    /* HEALTH BANNER */
+    .health-banner { border-radius:14px; padding:12px 14px; margin-bottom:14px; display:flex; align-items:flex-start; gap:12px; }
+    .health-emoji { font-size:26px; flex-shrink:0; margin-top:1px; }
+    .health-title { font-family:'Lora',serif; font-size:14px; font-weight:700; margin-bottom:3px; }
+    .health-desc { font-size:11px; line-height:1.5; opacity:.85; }
+ 
+    /* NUTRITION */
+    .section-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+    .nutrition-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+    .nutr-card { background:rgba(255,255,255,0.04); border-radius:12px; padding:10px 12px; border:1px solid var(--border); }
+    .nutr-val { font-family:'DM Mono',monospace; font-size:18px; font-weight:700; line-height:1; }
+    .nutr-unit { font-size:11px; font-weight:400; opacity:.55; }
+    .nutr-name { font-size:11px; color:var(--muted); margin-top:3px; }
+    .nutr-bar-track { height:3px; background:rgba(255,255,255,0.08); border-radius:2px; margin-top:6px; overflow:hidden; }
+    .nutr-bar-fill { height:100%; border-radius:2px; }
+ 
+    .analysis-note { font-size:11px; color:var(--dim); font-style:italic; margin-bottom:12px; background:rgba(255,255,255,0.03); padding:8px 10px; border-radius:8px; line-height:1.4; }
+    .btn-row { display:flex; gap:10px; }
+    .btn-confirm { flex:1; background:var(--green); color:#0e100f; border:none; border-radius:12px; padding:13px; font-size:14px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; }
+    .btn-confirm:active { opacity:.8; }
+    .btn-cancel { background:var(--surface); color:var(--text); border:1px solid var(--border); border-radius:12px; padding:13px 16px; font-size:14px; cursor:pointer; font-family:'DM Sans',sans-serif; }
+    .error-body { padding:16px 18px; }
+    .error-msg { color:var(--red); font-size:13px; margin-bottom:12px; }
+ 
+    /* TABS */
+    .tabs { display:flex; gap:5px; background:var(--surface); border-radius:14px; padding:5px; margin:18px 0 0; }
+    .tab { flex:1; background:transparent; border:1px solid transparent; border-radius:10px; padding:8px 4px; cursor:pointer; transition:all .2s; -webkit-appearance:none; }
+    .tab.active { background:var(--green-bg); border-color:var(--green-border); }
+    .tab-label { font-size:11px; font-weight:600; color:var(--dim); }
+    .tab.active .tab-label { color:var(--green); }
+    .tab-stat { font-family:'DM Mono',monospace; font-size:10px; color:var(--dim); margin-top:2px; }
+    .tab.active .tab-stat { color:rgba(74,222,128,.6); }
+ 
+    /* GOAL BAR */
+    .goal-bar { background:var(--surface); border-radius:14px; padding:14px 16px; margin:14px 0 0; }
+    .goal-bar-row { display:flex; justify-content:space-between; margin-bottom:8px; }
+    .goal-bar-label { font-size:12px; color:var(--muted); }
+    .goal-bar-val { font-family:'DM Mono',monospace; font-size:12px; }
+    .goal-track { height:6px; background:rgba(255,255,255,.06); border-radius:3px; overflow:hidden; }
+    .goal-fill { height:100%; border-radius:3px; transition:width .6s cubic-bezier(.34,1.56,.64,1); }
+    .goal-remaining { font-size:11px; margin-top:6px; }
+ 
+    /* MEALS */
+    .meals-section { margin-top:18px; }
+    .empty-state { text-align:center; padding:48px 0; }
+    .empty-icon { font-size:32px; margin-bottom:10px; }
+    .empty-text { font-family:'Lora',serif; font-size:14px; color:var(--dim); }
+    .meal-card { display:flex; gap:12px; align-items:flex-start; background:var(--surface); border-radius:14px; border:1px solid var(--border); padding:12px 14px; margin-bottom:8px; }
+    .meal-card:active { background:var(--surface2); }
+    .meal-thumb { width:52px; height:52px; border-radius:10px; object-fit:cover; flex-shrink:0; border:1px solid var(--border); }
+    .meal-thumb-placeholder { width:52px; height:52px; border-radius:10px; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+    .meal-info { flex:1; min-width:0; }
+    .meal-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+    .meal-name { font-family:'Lora',serif; font-size:14px; font-weight:600; line-height:1.3; }
+    .meal-cals { font-family:'DM Mono',monospace; font-size:14px; font-weight:700; color:var(--green); flex-shrink:0; }
+    .meal-macros { display:flex; gap:6px; margin-top:4px; flex-wrap:wrap; }
+    .meal-macro { font-size:10px; font-family:'DM Mono',monospace; }
+    .meal-health { display:inline-block; font-size:10px; margin-top:5px; padding:2px 8px; border-radius:20px; font-weight:600; }
+    .meal-footer { display:flex; justify-content:space-between; margin-top:5px; }
+    .meal-time { font-size:10px; color:var(--dim); }
+    .meal-delete { font-size:10px; color:var(--dim); background:none; border:none; cursor:pointer; padding:0; font-family:'DM Sans',sans-serif; }
+    .day-group { margin-bottom:20px; }
+    .day-head { display:flex; justify-content:space-between; margin-bottom:10px; }
+    .day-title { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+    .day-cals { font-family:'DM Mono',monospace; font-size:11px; color:var(--green); }
+ 
+    /* BOTTOM NAV */
+    .bottom-nav { position:fixed; bottom:0; left:0; right:0; padding:12px 20px; padding-bottom:max(12px,var(--safe)); background:rgba(14,16,15,.92); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-top:1px solid var(--border); z-index:100; }
+    .camera-btn { width:100%; background:var(--green); color:#0e100f; border:none; border-radius:16px; padding:15px; font-size:15px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'DM Sans',sans-serif; transition:opacity .2s,transform .1s; -webkit-appearance:none; }
+    .camera-btn:active { opacity:.85; transform:scale(.98); }
+ 
+    /* OVERLAY */
+    .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:200; align-items:flex-end; }
+    .overlay.open { display:flex; }
+    .overlay-card { width:100%; background:#1a1c1b; border-radius:24px 24px 0 0; padding:24px; padding-bottom:max(32px,var(--safe)); border-top:1px solid var(--border); animation:slideUp .3s cubic-bezier(.34,1.56,.64,1); overflow-y:auto; max-height:90vh; }
+    .overlay-handle { width:40px; height:4px; background:var(--border2); border-radius:2px; margin:0 auto 20px; }
+    .overlay-title { font-family:'Lora',serif; font-size:18px; font-weight:700; margin-bottom:20px; }
+    .overlay-section { margin-bottom:20px; }
+    .overlay-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+    .overlay-input { width:100%; background:var(--surface); border:1px solid var(--border2); border-radius:12px; padding:12px 14px; font-family:'DM Mono',monospace; font-size:13px; color:var(--text); outline:none; -webkit-appearance:none; transition:border .2s; }
+    .overlay-input:focus { border-color:var(--green); }
+    .goals-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+    .goal-input-wrap { display:flex; flex-direction:column; gap:6px; }
+    .goal-input-lbl { font-size:10px; color:var(--muted); font-family:'DM Mono',monospace; text-align:center; }
+    .goal-input { width:100%; background:var(--surface); border:1px solid var(--border2); border-radius:10px; padding:10px 6px; font-family:'DM Mono',monospace; font-size:13px; color:var(--text); outline:none; -webkit-appearance:none; text-align:center; }
+    .goal-input:focus { border-color:var(--green); }
+    .btn-save { width:100%; background:var(--green); color:#0e100f; border:none; border-radius:12px; padding:13px; font-size:14px; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; }
+    .btn-save:active { opacity:.8; }
+    .btn-danger { width:100%; background:rgba(248,113,113,.1); color:var(--red); border:1px solid rgba(248,113,113,.2); border-radius:12px; padding:13px; font-size:14px; cursor:pointer; margin-top:10px; font-family:'DM Sans',sans-serif; }
+ 
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+    @keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
+    ::-webkit-scrollbar { display:none; }
+    input[type="file"] { display:none; }
   </style>
 </head>
 <body>
 <div id="app">
-
-  <!-- ── SETUP SCREEN ── -->
+ 
+  <!-- SETUP SCREEN -->
   <div class="screen active" id="setup-screen">
     <div class="setup-logo">🍏</div>
     <div class="setup-title">CalAI</div>
-    <p class="setup-sub">Snap a photo of your food.<br/>AI calculates calories instantly.</p>
-    <div class="setup-label">Your Anthropic API Key</div>
-    <input class="setup-input" type="password" id="apikey-input" placeholder="sk-ant-api03-..." autocomplete="off" />
-    <p class="setup-hint">
-      Get your free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br/>
-      Your key is stored only on this device.
-    </p>
-    <button class="btn-primary" id="setup-btn">Get Started →</button>
+    <p class="setup-sub">Fotografo ushqimin tënd.<br/>AI llogarit kaloritë &amp; vlerat ushqyese.</p>
+    <div class="field-label">Anthropic API Key</div>
+    <input class="field-input" type="password" id="apikey-input" placeholder="sk-ant-api03-..." autocomplete="off" />
+    <div class="field-label">Limiti Ditor i Kalorive (kcal)</div>
+    <input class="field-input" type="number" id="goal-daily-setup" placeholder="2000" value="2000" inputmode="numeric" />
+    <p class="setup-hint">Merr key-n falas tek <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br/>Ruhet vetëm në këtë pajisje.</p>
+    <button class="btn-primary" id="setup-btn">Fillo →</button>
   </div>
-
-  <!-- ── MAIN SCREEN ── -->
+ 
+  <!-- MAIN SCREEN -->
   <div class="screen" id="main-screen">
     <div class="topbar">
       <div class="topbar-row">
@@ -256,405 +216,392 @@
           <div class="topbar-eyebrow">CalAI</div>
           <div class="topbar-title">Food Tracker</div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
+        <div class="topbar-right">
           <div class="topbar-date" id="topbar-date"></div>
-          <button class="settings-btn" id="settings-btn">⚙️</button>
+          <button class="icon-btn" id="settings-btn">⚙️</button>
         </div>
       </div>
     </div>
-
-    <!-- Stats Circles -->
-    <div class="stats-row" id="stats-row">
-      <!-- rendered by JS -->
-    </div>
-
-    <!-- Scrollable body -->
-    <div class="scroll-content" id="scroll-content">
-
-      <!-- Upload / Preview -->
-      <div id="upload-area">
-        <div class="upload-zone" id="upload-zone">
-          <div class="upload-icon">📸</div>
-          <div class="upload-title">Tap to photograph food</div>
-          <div class="upload-sub">AI will estimate calories &amp; macros</div>
-        </div>
-      </div>
-
-      <!-- Tabs -->
+ 
+    <div class="stats-row" id="stats-row"></div>
+ 
+    <div class="scroll-content">
+      <div id="upload-area"></div>
+ 
       <div class="tabs" id="tabs">
-        <button class="tab active" data-view="today">
-          <div class="tab-label">Today</div>
-          <div class="tab-stat" id="tab-today-stat">0 kcal</div>
-        </button>
-        <button class="tab" data-view="week">
-          <div class="tab-label">Week</div>
-          <div class="tab-stat" id="tab-week-stat">0 kcal</div>
-        </button>
-        <button class="tab" data-view="month">
-          <div class="tab-label">Month</div>
-          <div class="tab-stat" id="tab-month-stat">0 kcal</div>
-        </button>
+        <button class="tab active" data-view="today"><div class="tab-label">Sot</div><div class="tab-stat" id="tab-today-stat">0 kcal</div></button>
+        <button class="tab" data-view="week"><div class="tab-label">Java</div><div class="tab-stat" id="tab-week-stat">0 kcal</div></button>
+        <button class="tab" data-view="month"><div class="tab-label">Muaji</div><div class="tab-stat" id="tab-month-stat">0 kcal</div></button>
       </div>
-
-      <!-- Goal bar -->
+ 
       <div class="goal-bar">
         <div class="goal-bar-row">
-          <span class="goal-bar-label" id="goal-label">Daily Goal</span>
-          <span class="goal-bar-val" id="goal-val" style="color:var(--green)">0 / 2,000 kcal</span>
+          <span class="goal-bar-label" id="goal-label">Limiti Ditor</span>
+          <span class="goal-bar-val" id="goal-val"></span>
         </div>
-        <div class="goal-track"><div class="goal-fill" id="goal-fill" style="width:0%;background:linear-gradient(90deg,#4ade80,#34d399)"></div></div>
-        <div class="goal-remaining" id="goal-remaining">2,000 kcal remaining</div>
+        <div class="goal-track"><div class="goal-fill" id="goal-fill" style="width:0%"></div></div>
+        <div class="goal-remaining" id="goal-remaining"></div>
       </div>
-
-      <!-- Meals list -->
+ 
       <div class="meals-section" id="meals-list"></div>
     </div>
-
-    <!-- Bottom CTA -->
+ 
     <div class="bottom-nav">
-      <button class="camera-btn" id="camera-btn">
-        📷 &nbsp;Log a Meal
-      </button>
+      <button class="camera-btn" id="camera-btn">📷 &nbsp;Regjistro Vaktin</button>
     </div>
   </div>
 </div>
-
-<!-- Settings Overlay -->
+ 
+<!-- SETTINGS OVERLAY -->
 <div class="overlay" id="settings-overlay">
-  <div class="overlay-card slide-up">
+  <div class="overlay-card">
     <div class="overlay-handle"></div>
-    <div class="overlay-title">Settings</div>
-    <div class="overlay-label">Anthropic API Key</div>
-    <input class="overlay-input" type="password" id="overlay-key" placeholder="sk-ant-api03-..." />
-    <button class="btn-save" id="save-key-btn">Save Key</button>
-    <button class="btn-clear-all" id="clear-data-btn">🗑 Clear All Meal Data</button>
+    <div class="overlay-title">⚙️ Cilësimet</div>
+ 
+    <div class="overlay-section">
+      <div class="overlay-label">API Key</div>
+      <input class="overlay-input" type="password" id="overlay-key" placeholder="sk-ant-api03-..." />
+    </div>
+ 
+    <div class="overlay-section">
+      <div class="overlay-label">Limitet e Kalorive (kcal)</div>
+      <div class="goals-grid">
+        <div class="goal-input-wrap">
+          <div class="goal-input-lbl">📅 Ditor</div>
+          <input class="goal-input" type="number" id="goal-daily" inputmode="numeric" />
+        </div>
+        <div class="goal-input-wrap">
+          <div class="goal-input-lbl">📆 Javor</div>
+          <input class="goal-input" type="number" id="goal-weekly" inputmode="numeric" />
+        </div>
+        <div class="goal-input-wrap">
+          <div class="goal-input-lbl">🗓 Mujor</div>
+          <input class="goal-input" type="number" id="goal-monthly" inputmode="numeric" />
+        </div>
+      </div>
+    </div>
+ 
+    <button class="btn-save" id="save-settings-btn">💾 Ruaj Cilësimet</button>
+    <button class="btn-danger" id="clear-data-btn">🗑 Fshi të Gjitha Vaktet</button>
   </div>
 </div>
-
-<!-- Hidden file input -->
+ 
 <input type="file" id="file-input" accept="image/*" capture="environment" />
-
+ 
 <script>
-const DAILY_GOAL = 2000;
 let meals = [];
 let currentView = 'today';
 let apiKey = '';
-let pendingB64 = null;
-let pendingType = null;
-
-// ── Storage ──
-function save() { try { localStorage.setItem('calai-meals', JSON.stringify(meals)); } catch(e){} }
-function load() {
-  try {
-    const d = localStorage.getItem('calai-meals');
-    if (d) meals = JSON.parse(d);
-  } catch(e) { meals = []; }
-}
-function loadKey() { return localStorage.getItem('calai-apikey') || ''; }
-function saveKey(k) { localStorage.setItem('calai-apikey', k); }
-
-// ── Date helpers ──
-function dateKey(d = new Date()) { return d.toISOString().split('T')[0]; }
-function weekKey(d = new Date()) {
-  const x = new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate() - x.getDay());
-  return x.toISOString().split('T')[0];
-}
-function monthKey(d = new Date()) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
-function sum(arr) { return arr.reduce((a,m) => a + (m.calories||0), 0); }
-
+let goals = { daily: 2000, weekly: 14000, monthly: 60000 };
+let pendingB64 = null, pendingType = null;
+ 
+function save()      { try { localStorage.setItem('calai-meals', JSON.stringify(meals)); } catch(e){} }
+function load()      { try { const d=localStorage.getItem('calai-meals'); if(d) meals=JSON.parse(d); } catch(e){ meals=[]; } }
+function loadKey()   { return localStorage.getItem('calai-apikey')||''; }
+function saveKey(k)  { localStorage.setItem('calai-apikey', k); }
+function loadGoals() { try { const g=localStorage.getItem('calai-goals'); if(g) goals=JSON.parse(g); } catch(e){} }
+function saveGoals() { localStorage.setItem('calai-goals', JSON.stringify(goals)); }
+ 
+function dateKey(d=new Date())  { return d.toISOString().split('T')[0]; }
+function weekKey(d=new Date())  { const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x.toISOString().split('T')[0]; }
+function monthKey(d=new Date()) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function sum(arr)               { return arr.reduce((a,m)=>a+(m.calories||0),0); }
+ 
 function filterMeals(view) {
   const now = new Date();
-  if (view === 'today') return meals.filter(m => dateKey(new Date(m.ts)) === dateKey(now));
-  if (view === 'week')  return meals.filter(m => weekKey(new Date(m.ts)) === weekKey(now));
-  return meals.filter(m => monthKey(new Date(m.ts)) === monthKey(now));
+  if(view==='today') return meals.filter(m=>dateKey(new Date(m.ts))===dateKey(now));
+  if(view==='week')  return meals.filter(m=>weekKey(new Date(m.ts))===weekKey(now));
+  return meals.filter(m=>monthKey(new Date(m.ts))===monthKey(now));
 }
-
-// ── Init ──
+ 
+function getHealthInfo(r) {
+  let score = 100;
+  const br = r.breakdown || {};
+  const fat=br.fat||0, sugar=br.sugar||0, protein=br.protein||0;
+  const fiber=br.fiber||0, sodium=br.sodium||0, cals=r.calories||0;
+ 
+  if(sugar>25) score-=25; else if(sugar>15) score-=15; else if(sugar>8) score-=8;
+  if(fat>30) score-=20; else if(fat>20) score-=10;
+  if(sodium>800) score-=20; else if(sodium>400) score-=10;
+  if(protein>20) score+=10; else if(protein>10) score+=5;
+  if(fiber>5) score+=10; else if(fiber>2) score+=5;
+  if(cals>800) score-=15; else if(cals>500) score-=5;
+  score = Math.max(0, Math.min(100, score));
+ 
+  if(score>=75) return { emoji:'💚', label:'I Shëndetshëm', color:'#4ade80', bg:'rgba(74,222,128,0.1)', border:'rgba(74,222,128,0.25)', desc: r.healthNote||'Ushqim i mirë me vlera të larta ushqyese.' };
+  if(score>=50) return { emoji:'🟡', label:'Mesatar', color:'#fbbf24', bg:'rgba(251,191,36,0.1)', border:'rgba(251,191,36,0.25)', desc: r.healthNote||'I pranueshëm, por konsumoje me moderim.' };
+  if(score>=30) return { emoji:'🟠', label:'Me Kujdes', color:'#fb923c', bg:'rgba(251,146,60,0.1)', border:'rgba(251,146,60,0.25)', desc: r.healthNote||'I lartë në yndyrna ose sheqer. Mos e teprosh.' };
+  return { emoji:'❌', label:'Jo i Shëndetshëm', color:'#f87171', bg:'rgba(248,113,113,0.1)', border:'rgba(248,113,113,0.25)', desc: r.healthNote||'Vlera shumë të ulëta ushqyese. Shmange sa më shumë.' };
+}
+ 
 function init() {
-  load();
+  load(); loadGoals();
   apiKey = loadKey();
-  if (apiKey) showMain();
-  else showSetup();
-
-  // Date
-  const now = new Date();
-  document.getElementById('topbar-date').innerHTML =
-    now.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'}) + '<br>' +
-    now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-
-  // Setup btn
+ 
+  document.getElementById('topbar-date').textContent =
+    new Date().toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});
+ 
+  if(apiKey) showMain(); else showSetup();
+ 
   document.getElementById('setup-btn').addEventListener('click', () => {
     const k = document.getElementById('apikey-input').value.trim();
-    if (!k.startsWith('sk-')) { alert('Please enter a valid API key starting with sk-'); return; }
-    apiKey = k; saveKey(k); showMain();
+    if(!k.startsWith('sk-')) { alert('Vendos API key të vlefshëm që fillon me sk-'); return; }
+    const d = parseInt(document.getElementById('goal-daily-setup').value)||2000;
+    apiKey=k; saveKey(k);
+    goals = {daily:d, weekly:d*7, monthly:d*30}; saveGoals();
+    showMain();
   });
-
-  // Camera btn + upload zone
-  document.getElementById('camera-btn').addEventListener('click', () => document.getElementById('file-input').click());
-  document.getElementById('upload-zone').addEventListener('click', () => document.getElementById('file-input').click());
-  document.getElementById('file-input').addEventListener('change', e => { if(e.target.files[0]) handleFile(e.target.files[0]); e.target.value=''; });
-
-  // Tabs
-  document.getElementById('tabs').addEventListener('click', e => {
-    const tab = e.target.closest('[data-view]');
-    if (!tab) return;
-    currentView = tab.dataset.view;
-    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === currentView));
-    renderMeals();
-    renderGoalBar();
+ 
+  document.getElementById('camera-btn').addEventListener('click', ()=>document.getElementById('file-input').click());
+  document.getElementById('file-input').addEventListener('change', e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); e.target.value=''; });
+ 
+  document.getElementById('tabs').addEventListener('click', e=>{
+    const tab=e.target.closest('[data-view]');
+    if(!tab) return;
+    currentView=tab.dataset.view;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===currentView));
+    renderMeals(); renderGoalBar();
   });
-
-  // Settings
-  document.getElementById('settings-btn').addEventListener('click', () => {
-    document.getElementById('overlay-key').value = apiKey;
+ 
+  document.getElementById('settings-btn').addEventListener('click', ()=>{
+    document.getElementById('overlay-key').value   = apiKey;
+    document.getElementById('goal-daily').value    = goals.daily;
+    document.getElementById('goal-weekly').value   = goals.weekly;
+    document.getElementById('goal-monthly').value  = goals.monthly;
     document.getElementById('settings-overlay').classList.add('open');
   });
-  document.getElementById('settings-overlay').addEventListener('click', e => {
-    if (e.target === document.getElementById('settings-overlay')) document.getElementById('settings-overlay').classList.remove('open');
+  document.getElementById('settings-overlay').addEventListener('click', e=>{
+    if(e.target===document.getElementById('settings-overlay')) document.getElementById('settings-overlay').classList.remove('open');
   });
-  document.getElementById('save-key-btn').addEventListener('click', () => {
+  document.getElementById('save-settings-btn').addEventListener('click', ()=>{
     const k = document.getElementById('overlay-key').value.trim();
-    if (k) { apiKey = k; saveKey(k); }
+    if(k) { apiKey=k; saveKey(k); }
+    goals.daily   = parseInt(document.getElementById('goal-daily').value)  ||2000;
+    goals.weekly  = parseInt(document.getElementById('goal-weekly').value) ||goals.daily*7;
+    goals.monthly = parseInt(document.getElementById('goal-monthly').value)||goals.daily*30;
+    saveGoals(); renderAll();
     document.getElementById('settings-overlay').classList.remove('open');
   });
-  document.getElementById('clear-data-btn').addEventListener('click', () => {
-    if (confirm('Delete all logged meals?')) { meals = []; save(); renderAll(); document.getElementById('settings-overlay').classList.remove('open'); }
+  document.getElementById('clear-data-btn').addEventListener('click', ()=>{
+    if(confirm('Të fshihen të gjitha vaktet?')) {
+      meals=[]; save(); renderAll();
+      document.getElementById('settings-overlay').classList.remove('open');
+    }
   });
+ 
+  resetUpload();
 }
-
-function showSetup() {
-  document.getElementById('setup-screen').classList.add('active');
-  document.getElementById('main-screen').classList.remove('active');
-}
-function showMain() {
-  document.getElementById('setup-screen').classList.remove('active');
-  document.getElementById('main-screen').classList.add('active');
-  renderAll();
-}
-
-// ── Render ──
+ 
+function showSetup() { document.getElementById('setup-screen').classList.add('active'); document.getElementById('main-screen').classList.remove('active'); }
+function showMain()  { document.getElementById('setup-screen').classList.remove('active'); document.getElementById('main-screen').classList.add('active'); renderAll(); }
 function renderAll() { renderStats(); renderTabs(); renderGoalBar(); renderMeals(); }
-
+ 
 function renderStats() {
-  const todayCals = sum(filterMeals('today'));
-  const weekCals  = sum(filterMeals('week'));
-  const monthCals = sum(filterMeals('month'));
-  const items = [
-    { val: todayCals, max: DAILY_GOAL,    color: '#4ade80', lbl: 'today' },
-    { val: weekCals,  max: DAILY_GOAL*7,  color: '#60a5fa', lbl: 'week'  },
-    { val: monthCals, max: DAILY_GOAL*30, color: '#f9a8d4', lbl: 'month' },
-  ];
-  const SIZE = 100, STROKE = 9, R = (SIZE-STROKE)/2, CIRC = 2*Math.PI*R;
-  document.getElementById('stats-row').innerHTML = items.map(({val,max,color,lbl}) => {
-    const pct = Math.min(val/max,1), dash = pct*CIRC;
-    return `<div class="circle-wrap" style="width:${SIZE}px;height:${SIZE}px">
-      <svg width="${SIZE}" height="${SIZE}" style="transform:rotate(-90deg)">
-        <circle cx="${SIZE/2}" cy="${SIZE/2}" r="${R}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="${STROKE}"/>
-        <circle cx="${SIZE/2}" cy="${SIZE/2}" r="${R}" fill="none" stroke="${color}" stroke-width="${STROKE}"
-          stroke-dasharray="${dash} ${CIRC}" stroke-linecap="round"/>
+  const tc=sum(filterMeals('today')), wc=sum(filterMeals('week')), mc=sum(filterMeals('month'));
+  const items=[{v:tc,max:goals.daily,c:'#4ade80',l:'sot'},{v:wc,max:goals.weekly,c:'#60a5fa',l:'javë'},{v:mc,max:goals.monthly,c:'#f9a8d4',l:'muaj'}];
+  const S=100,ST=9,R=(S-ST)/2,C=2*Math.PI*R;
+  document.getElementById('stats-row').innerHTML = items.map(({v,max,c,l})=>{
+    const dash=Math.min(v/max,1)*C;
+    return `<div class="circle-wrap" style="width:${S}px;height:${S}px">
+      <svg width="${S}" height="${S}" style="transform:rotate(-90deg)">
+        <circle cx="${S/2}" cy="${S/2}" r="${R}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="${ST}"/>
+        <circle cx="${S/2}" cy="${S/2}" r="${R}" fill="none" stroke="${c}" stroke-width="${ST}" stroke-dasharray="${dash} ${C}" stroke-linecap="round"/>
       </svg>
-      <div class="circle-inner">
-        <span class="circle-val" style="color:${color}">${val}</span>
-        <span class="circle-lbl">${lbl}</span>
-      </div>
+      <div class="circle-inner"><span class="circle-val" style="color:${c}">${v}</span><span class="circle-lbl">${l}</span></div>
     </div>`;
   }).join('');
 }
-
+ 
 function renderTabs() {
-  document.getElementById('tab-today-stat').textContent = sum(filterMeals('today')) + ' kcal';
-  document.getElementById('tab-week-stat').textContent  = sum(filterMeals('week'))  + ' kcal';
-  document.getElementById('tab-month-stat').textContent = sum(filterMeals('month')) + ' kcal';
+  document.getElementById('tab-today-stat').textContent  = sum(filterMeals('today'))+' kcal';
+  document.getElementById('tab-week-stat').textContent   = sum(filterMeals('week'))+' kcal';
+  document.getElementById('tab-month-stat').textContent  = sum(filterMeals('month'))+' kcal';
 }
-
+ 
 function renderGoalBar() {
-  const labels = { today: 'Daily Goal', week: 'Weekly Goal', month: 'Monthly Goal' };
-  const goals  = { today: DAILY_GOAL, week: DAILY_GOAL*7, month: DAILY_GOAL*30 };
-  const current = sum(filterMeals(currentView));
-  const goal = goals[currentView];
-  const over = current > goal;
+  const labels={today:'Limiti Ditor',week:'Limiti Javor',month:'Limiti Mujor'};
+  const gmap={today:goals.daily,week:goals.weekly,month:goals.monthly};
+  const cur=sum(filterMeals(currentView)), goal=gmap[currentView], over=cur>goal;
   document.getElementById('goal-label').textContent = labels[currentView];
-  document.getElementById('goal-val').textContent = `${current.toLocaleString()} / ${goal.toLocaleString()} kcal`;
-  document.getElementById('goal-val').style.color = over ? 'var(--red)' : 'var(--green)';
-  document.getElementById('goal-fill').style.width = Math.min(current/goal*100,100) + '%';
-  document.getElementById('goal-fill').style.background = over ? 'var(--red)' : 'linear-gradient(90deg,#4ade80,#34d399)';
+  document.getElementById('goal-val').textContent   = `${cur.toLocaleString()} / ${goal.toLocaleString()} kcal`;
+  document.getElementById('goal-val').style.color   = over?'var(--red)':'var(--green)';
+  document.getElementById('goal-fill').style.width  = Math.min(cur/goal*100,100)+'%';
+  document.getElementById('goal-fill').style.background = over?'var(--red)':'linear-gradient(90deg,#4ade80,#34d399)';
   document.getElementById('goal-remaining').textContent = over
-    ? `⚠ ${(current-goal).toLocaleString()} kcal over goal`
-    : `${(goal-current).toLocaleString()} kcal remaining`;
-  document.getElementById('goal-remaining').style.color = over ? 'var(--red)' : 'var(--text-dim)';
+    ? `⚠ ${(cur-goal).toLocaleString()} kcal mbi limit`
+    : `${(goal-cur).toLocaleString()} kcal mbetur`;
+  document.getElementById('goal-remaining').style.color = over?'var(--red)':'var(--dim)';
 }
-
+ 
 function renderMeals() {
-  const ms = filterMeals(currentView);
-  const el = document.getElementById('meals-list');
-  if (!ms.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🍽</div><div class="empty-text">No meals logged ${currentView === 'today' ? 'today' : 'this '+currentView}</div></div>`;
+  const ms=filterMeals(currentView), el=document.getElementById('meals-list');
+  if(!ms.length) {
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🍽</div><div class="empty-text">Nuk ka vaktime ${currentView==='today'?'sot':'këtë '+currentView}</div></div>`;
     return;
   }
-  if (currentView === 'today') {
-    el.innerHTML = ms.map(mealHTML).join('');
+  if(currentView==='today') {
+    el.innerHTML=ms.map(mealHTML).join('');
   } else {
-    // group by day
-    const groups = {};
-    ms.forEach(m => { const k = dateKey(new Date(m.ts)); (groups[k]||(groups[k]=[])).push(m); });
-    el.innerHTML = Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([day,dayMeals]) => `
-      <div class="day-group">
-        <div class="section-head">
-          <span class="section-title">${new Date(day+'T12:00:00').toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'})}</span>
-          <span class="section-cals">${sum(dayMeals)} kcal</span>
-        </div>
-        ${dayMeals.map(mealHTML).join('')}
-      </div>`).join('');
+    const groups={};
+    ms.forEach(m=>{const k=dateKey(new Date(m.ts));(groups[k]||(groups[k]=[])).push(m);});
+    el.innerHTML=Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([day,dm])=>
+      `<div class="day-group"><div class="day-head"><span class="day-title">${new Date(day+'T12:00:00').toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'})}</span><span class="day-cals">${sum(dm)} kcal</span></div>${dm.map(mealHTML).join('')}</div>`
+    ).join('');
   }
-  // attach delete listeners
-  el.querySelectorAll('[data-delete]').forEach(btn => {
-    btn.addEventListener('click', () => { meals = meals.filter(m=>m.id!==btn.dataset.delete); save(); renderAll(); });
+  el.querySelectorAll('[data-delete]').forEach(btn=>{
+    btn.addEventListener('click',()=>{meals=meals.filter(m=>m.id!==btn.dataset.delete);save();renderAll();});
   });
 }
-
+ 
 function mealHTML(m) {
-  const time = new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  const img = m.img
-    ? `<img class="meal-thumb" src="data:image/jpeg;base64,${m.img}" alt="${m.name}" />`
-    : `<div class="meal-thumb-placeholder">🍽</div>`;
-  const macros = m.breakdown
-    ? `<div class="meal-macros">
-        <span class="meal-macro" style="color:var(--blue)">P ${m.breakdown.protein}g</span>
-        <span class="meal-macro" style="color:var(--pink)">C ${m.breakdown.carbs}g</span>
-        <span class="meal-macro" style="color:var(--amber)">F ${m.breakdown.fat}g</span>
-      </div>` : '';
-  return `<div class="meal-card">
-    ${img}
-    <div class="meal-info">
-      <div class="meal-top">
-        <span class="meal-name">${m.name}</span>
-        <span class="meal-cals">${m.calories}</span>
-      </div>
-      ${macros}
-      <div class="meal-footer">
-        <span class="meal-time">${time}</span>
-        <button class="meal-delete" data-delete="${m.id}">remove</button>
-      </div>
-    </div>
+  const time=new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const img=m.img?`<img class="meal-thumb" src="data:image/jpeg;base64,${m.img}"/>`:`<div class="meal-thumb-placeholder">🍽</div>`;
+  const br=m.breakdown||{};
+  const macros=`<div class="meal-macros">
+    <span class="meal-macro" style="color:var(--blue)">P ${br.protein||0}g</span>
+    <span class="meal-macro" style="color:var(--pink)">Karb ${br.carbs||0}g</span>
+    <span class="meal-macro" style="color:var(--amber)">Ynd ${br.fat||0}g</span>
+    <span class="meal-macro" style="color:var(--red)">Sheq ${br.sugar||0}g</span>
   </div>`;
+  const hi=m.healthInfo;
+  const badge=hi?`<span class="meal-health" style="background:${hi.bg};color:${hi.color};border:1px solid ${hi.border}">${hi.emoji} ${hi.label}</span>`:'';
+  return `<div class="meal-card">${img}<div class="meal-info">
+    <div class="meal-top"><span class="meal-name">${m.name}</span><span class="meal-cals">${m.calories} kcal</span></div>
+    ${macros}${badge}
+    <div class="meal-footer"><span class="meal-time">${time}</span><button class="meal-delete" data-delete="${m.id}">fshi</button></div>
+  </div></div>`;
 }
-
-// ── File handling ──
+ 
 async function handleFile(file) {
-  if (!file.type.startsWith('image/')) return;
-  const b64 = await toBase64(file);
-  pendingB64 = b64; pendingType = file.type;
+  if(!file.type.startsWith('image/')) return;
+  const b64=await toBase64(file);
+  pendingB64=b64; pendingType=file.type;
   showPreview(URL.createObjectURL(file));
   await analyze(b64, file.type);
 }
-
 function toBase64(file) {
-  return new Promise((res,rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(',')[1]);
-    r.onerror = () => rej(new Error('read fail'));
-    r.readAsDataURL(file);
-  });
+  return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
 }
-
+ 
 function showPreview(url) {
-  document.getElementById('upload-area').innerHTML = `
-    <div class="preview-card slide-up">
-      <img class="preview-img" id="preview-img" src="${url}" alt="food" />
-      <div id="preview-body">
-        <div class="preview-loader">
-          <div class="spinner"></div>
-          <span class="loader-text">Analyzing your food...</span>
-        </div>
-      </div>
+  document.getElementById('upload-area').innerHTML=`
+    <div class="preview-card">
+      <img class="preview-img" src="${url}"/>
+      <div id="preview-body"><div class="preview-loader"><div class="spinner"></div><span class="loader-text">Duke analizuar ushqimin...</span></div></div>
     </div>`;
 }
-
+ 
 async function analyze(b64, mimeType) {
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mimeType, data: b64 } },
-            { type: 'text', text: `Analyze this food image. Respond ONLY with valid JSON, no markdown, no extra text:
-{"name":"dish name","calories":number,"servingSize":"portion estimate","breakdown":{"protein":number,"carbs":number,"fat":number},"confidence":"low|medium|high","notes":"brief note"}` }
-          ]
-        }]
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-opus-4-5',
+        max_tokens:1200,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mimeType,data:b64}},
+          {type:'text',text:`Analyze this food photo carefully. Respond ONLY with valid JSON, no markdown, no extra text:
+{
+  "name": "emri i ushqimit",
+  "calories": number,
+  "servingSize": "porsia e vlerësuar",
+  "breakdown": {
+    "protein": grams,
+    "carbs": grams,
+    "fat": grams,
+    "sugar": grams,
+    "fiber": grams,
+    "sodium": milligrams
+  },
+  "confidence": "low|medium|high",
+  "healthNote": "1-2 fjali në gjuhën shqipe: a është i shëndetshëm ky ushqim dhe pse",
+  "notes": "shënim i shkurtër mbi vlerësimin"
+}`}
+        ]}]
       })
     });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error.message);
-    const text = data.content?.find(b=>b.type==='text')?.text || '';
-    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message);
+    const text=data.content?.find(b=>b.type==='text')?.text||'';
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
     showAnalysis(parsed);
   } catch(e) {
-    showError(e.message || 'Could not analyze. Please try again.');
+    showError(e.message||'Nuk u analizua. Provo përsëri.');
   }
 }
-
+ 
 function showAnalysis(r) {
-  document.getElementById('preview-body').innerHTML = `
+  const hi=getHealthInfo(r);
+  const br=r.breakdown||{};
+  const refs={protein:50,carbs:260,fat:70,sugar:30,fiber:25,sodium:2300};
+  const nutriCards=[
+    {key:'protein', name:'Proteinë',     color:'var(--blue)',   unit:'g'},
+    {key:'carbs',   name:'Karbohidrate', color:'var(--pink)',   unit:'g'},
+    {key:'fat',     name:'Yndyrna',      color:'var(--amber)',  unit:'g'},
+    {key:'sugar',   name:'Sheqer',       color:'var(--red)',    unit:'g'},
+    {key:'fiber',   name:'Fibra',        color:'var(--green)',  unit:'g'},
+    {key:'sodium',  name:'Sodium',       color:'var(--purple)', unit:'mg'},
+  ].map(({key,name,color,unit})=>{
+    const val=br[key]||0, pct=Math.min(val/refs[key]*100,100);
+    return `<div class="nutr-card">
+      <div class="nutr-val" style="color:${color}">${val}<span class="nutr-unit">${unit}</span></div>
+      <div class="nutr-name">${name}</div>
+      <div class="nutr-bar-track"><div class="nutr-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+ 
+  document.getElementById('preview-body').innerHTML=`
     <div class="analysis-body">
       <div class="analysis-top">
-        <div><div class="analysis-name">${r.name}</div><div class="analysis-serving">${r.servingSize||''}</div></div>
-        <div class="analysis-cals">${r.calories}</div>
+        <div style="flex:1;min-width:0"><div class="analysis-name">${r.name}</div><div class="analysis-serving">${r.servingSize||''}</div></div>
+        <div style="text-align:right;flex-shrink:0;margin-left:12px"><div class="analysis-cals">${r.calories}</div><div class="analysis-cals-lbl">kcal</div></div>
       </div>
-      <div class="macro-row">
-        <div class="macro-chip"><div class="macro-val" style="color:var(--blue)">${r.breakdown?.protein||0}g</div><div class="macro-lbl">Protein</div></div>
-        <div class="macro-chip"><div class="macro-val" style="color:var(--pink)">${r.breakdown?.carbs||0}g</div><div class="macro-lbl">Carbs</div></div>
-        <div class="macro-chip"><div class="macro-val" style="color:var(--amber)">${r.breakdown?.fat||0}g</div><div class="macro-lbl">Fat</div></div>
+ 
+      <div class="health-banner" style="background:${hi.bg};border:1px solid ${hi.border}">
+        <div class="health-emoji">${hi.emoji}</div>
+        <div><div class="health-title" style="color:${hi.color}">${hi.label}</div><div class="health-desc" style="color:${hi.color}">${hi.desc}</div></div>
       </div>
-      ${r.notes ? `<div class="analysis-note">📝 ${r.notes}</div>` : ''}
+ 
+      <div class="section-label">Vlerat Ushqyese</div>
+      <div class="nutrition-grid">${nutriCards}</div>
+ 
+      ${r.notes?`<div class="analysis-note">📝 ${r.notes}</div>`:''}
+ 
       <div class="btn-row">
-        <button class="btn-confirm" id="confirm-btn">✓ Log this meal</button>
+        <button class="btn-confirm" id="confirm-btn">✓ Regjistro vaktin</button>
         <button class="btn-cancel" id="cancel-btn">✕</button>
       </div>
     </div>`;
-  document.getElementById('confirm-btn').addEventListener('click', () => confirmMeal(r));
-  document.getElementById('cancel-btn').addEventListener('click', resetUpload);
+ 
+  document.getElementById('confirm-btn').addEventListener('click',()=>confirmMeal(r,hi));
+  document.getElementById('cancel-btn').addEventListener('click',resetUpload);
 }
-
+ 
 function showError(msg) {
-  document.getElementById('preview-body').innerHTML = `
-    <div class="error-body">
-      <div class="error-msg">⚠ ${msg}</div>
-      <button class="btn-cancel" id="cancel-btn">Try again</button>
-    </div>`;
-  document.getElementById('cancel-btn').addEventListener('click', resetUpload);
+  document.getElementById('preview-body').innerHTML=`
+    <div class="error-body"><div class="error-msg">⚠ ${msg}</div><button class="btn-cancel" id="cancel-btn">Provo përsëri</button></div>`;
+  document.getElementById('cancel-btn').addEventListener('click',resetUpload);
 }
-
-function confirmMeal(r) {
-  const meal = { id: Date.now().toString(), ts: new Date().toISOString(), img: pendingB64, name: r.name, calories: r.calories, breakdown: r.breakdown, servingSize: r.servingSize };
-  meals.unshift(meal); save();
-  resetUpload(); renderAll();
-  // scroll to top of list
-  setTimeout(() => { const el = document.getElementById('scroll-content'); if(el) el.scrollTo({top:0,behavior:'smooth'}); }, 100);
+ 
+function confirmMeal(r,hi) {
+  meals.unshift({id:Date.now().toString(),ts:new Date().toISOString(),img:pendingB64,name:r.name,calories:r.calories,breakdown:r.breakdown,servingSize:r.servingSize,healthInfo:hi});
+  save(); resetUpload(); renderAll();
 }
-
+ 
 function resetUpload() {
-  pendingB64 = null; pendingType = null;
-  document.getElementById('upload-area').innerHTML = `
+  pendingB64=null; pendingType=null;
+  document.getElementById('upload-area').innerHTML=`
     <div class="upload-zone" id="upload-zone">
       <div class="upload-icon">📸</div>
-      <div class="upload-title">Tap to photograph food</div>
-      <div class="upload-sub">AI will estimate calories &amp; macros</div>
+      <div class="upload-title">Fotografo ushqimin tënd</div>
+      <div class="upload-sub">AI llogarit kaloritë &amp; vlerat ushqyese</div>
     </div>`;
-  document.getElementById('upload-zone').addEventListener('click', () => document.getElementById('file-input').click());
+  document.getElementById('upload-zone').addEventListener('click',()=>document.getElementById('file-input').click());
 }
-
-// ── Boot ──
+ 
 init();
-
-// ── Service Worker ──
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
-}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
