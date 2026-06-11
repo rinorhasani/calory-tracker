@@ -204,7 +204,7 @@
     <input class="field-input" type="password" id="apikey-input" placeholder="sk-ant-api03-..." autocomplete="off" />
     <div class="field-label">Limiti Ditor i Kalorive (kcal)</div>
     <input class="field-input" type="number" id="goal-daily-setup" placeholder="2000" value="2000" inputmode="numeric" />
-    <p class="setup-hint">Merr key-n falas tek <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br/>Ruhet vetëm në këtë pajisje.</p>
+    <p class="setup-hint">Merr key-n tek <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br/>Nuk ruhet askund — futet sa herë hap aplikacionin.</p>
     <button class="btn-primary" id="setup-btn">Fillo →</button>
   </div>
  
@@ -298,8 +298,10 @@ let pendingB64 = null, pendingType = null;
 function save()      { try { localStorage.setItem('calai-meals', JSON.stringify(meals)); return true; } catch(e){ alert('Hapësira e ruajtjes u mbush. Fshi disa vakte të vjetra për të vazhduar.'); return false; } }
 function esc(s)      { return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function load()      { try { const d=localStorage.getItem('calai-meals'); if(d) meals=JSON.parse(d); } catch(e){ meals=[]; } }
-function loadKey()   { return localStorage.getItem('calai-apikey')||''; }
-function saveKey(k)  { localStorage.setItem('calai-apikey', k); }
+// The Anthropic API key is intentionally NOT persisted. It lives only in
+// memory for the current session, so the app stays locked on every launch
+// until the key is entered again. Nobody can open it without the key.
+function purgeStoredKey() { try { localStorage.removeItem('calai-apikey'); } catch(e){} }
 function loadGoals() { try { const g=localStorage.getItem('calai-goals'); if(g) goals=JSON.parse(g); } catch(e){} }
 function saveGoals() { localStorage.setItem('calai-goals', JSON.stringify(goals)); }
  
@@ -337,19 +339,22 @@ function getHealthInfo(r) {
  
 function init() {
   load(); loadGoals();
-  apiKey = loadKey();
+  purgeStoredKey();   // clear any key saved by older versions
+  apiKey = '';
  
   document.getElementById('topbar-date').textContent =
     new Date().toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});
  
-  if(apiKey) showMain(); else showSetup();
+  document.getElementById('goal-daily-setup').value = goals.daily;
+  showSetup();   // always require the key on launch — never auto-open
  
   document.getElementById('setup-btn').addEventListener('click', () => {
     const k = document.getElementById('apikey-input').value.trim();
     if(!k.startsWith('sk-')) { alert('Vendos API key të vlefshëm që fillon me sk-'); return; }
     const d = parseInt(document.getElementById('goal-daily-setup').value)||2000;
-    apiKey=k; saveKey(k);
+    apiKey=k;   // kept in memory only, never written to storage
     goals = {daily:d, weekly:d*7, monthly:d*30}; saveGoals();
+    document.getElementById('apikey-input').value='';
     showMain();
   });
  
@@ -376,7 +381,7 @@ function init() {
   });
   document.getElementById('save-settings-btn').addEventListener('click', ()=>{
     const k = document.getElementById('overlay-key').value.trim();
-    if(k) { apiKey=k; saveKey(k); }
+    if(k) { apiKey=k; }   // in-memory only, not persisted
     goals.daily   = parseInt(document.getElementById('goal-daily').value)  ||2000;
     goals.weekly  = parseInt(document.getElementById('goal-weekly').value) ||goals.daily*7;
     goals.monthly = parseInt(document.getElementById('goal-monthly').value)||goals.daily*30;
