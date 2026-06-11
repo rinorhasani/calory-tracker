@@ -1,0 +1,8 @@
+{
+  "appId": "com.rinor.calai",
+  "appName": "CalAI",
+  "webDir": "www",
+  "server": {
+    "iosScheme": "https"
+  }
+}
